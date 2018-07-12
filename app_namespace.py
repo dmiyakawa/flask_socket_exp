@@ -1,5 +1,11 @@
 #!/usr/bin/env python
+
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from logging import getLogger, StreamHandler, Formatter, DEBUG, INFO
+import platform
+import sys
 from threading import Lock
+
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, Namespace, emit, join_room, leave_room, \
     close_room, rooms, disconnect
@@ -10,7 +16,7 @@ from flask_socketio import SocketIO, Namespace, emit, join_room, leave_room, \
 async_mode = None
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = '1LttTkBrm2YuayjDm9M6yTzMBAzrEpKZmJo7iqV5QbrOqPdxmC'
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
@@ -96,4 +102,24 @@ socketio.on_namespace(MyNamespace('/test'))
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    parser = ArgumentParser(description=(__doc__),
+                            formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Show debug log')
+    parser.add_argument('--host', action='store', default=None,
+                        help='host for the server')
+    args = parser.parse_args()
+
+    logger = getLogger(__name__)
+    handler = StreamHandler()
+    logger.addHandler(handler)
+    if args.debug:
+        logger.setLevel(DEBUG)
+        handler.setLevel(DEBUG)
+    else:
+        logger.setLevel(INFO)
+        handler.setLevel(INFO)
+    handler.setFormatter(Formatter('%(asctime)s %(levelname)7s %(message)s'))
+    logger.debug('Start Running (Python {})'.format(platform.python_version()))
+    socketio.run(app, host=args.host, debug=True)
+    logger.debug('Finished Running')

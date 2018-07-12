@@ -1,9 +1,10 @@
-<html>
+<!DOCTYPE HTML>
+<html lang="ja">
     <head>
-        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/pure.min.css') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/socket.io-2.1.1.js') }}"></script>
     </head>
     <body>
         <div class="pure-g">
@@ -61,83 +62,6 @@
             <div class="pure-u-1-4"></div>
         </div>
 
-        <script>
-            // HTTP handlers
-            window.setInterval(function() {
-                $.ajax({
-                    type: 'GET',
-                    url: '/session',
-                    success: function(data) {
-                        $('#http-session').text(data['session']);
-                        $('#http-user').text(data['user']);
-                    }
-                });
-            }, 1000);
-
-            $('#submit-http').click(function() {
-                $.ajax({
-                    type: 'POST',
-                    url: '/session',
-                    data: JSON.stringify({session: $('#http-session-set').val()}),
-                    contentType: 'application/json'
-                });
-            });
-            $('#login-http').click(function() {
-                $.ajax({
-                    type: 'POST',
-                    url: '/session',
-                    data: JSON.stringify({user: $('#http-user-set').val()}),
-                    contentType: 'application/json'
-                });
-            });
-            $('#logout-http').click(function() {
-                $.ajax({
-                    type: 'POST',
-                    url: '/session',
-                    data: JSON.stringify({user: null}),
-                    contentType: 'application/json'
-                });
-            });
-
-
-            // Socket.IO handlers
-            var socket = null;
-
-            $('#connect').click(function() {
-                if (!socket) {
-                    socket = io.connect(location.href);
-                    socket.on('refresh-session', function(data) {
-                        $('#socketio-session').text(data['session']);
-                        $('#socketio-user').text(data['user']);
-                    });
-
-                    $('#connect').text('Disconnect');
-                    $('#socketio').show();
-                }
-                else {
-                    socket.disconnect();
-                    socket = null;
-                    $('#socketio').hide();
-                    $('#connect').text('Connect');
-                    $('#socketio-session').text('');
-                    $('#socketio-user').text('');
-                }
-            });
-
-            window.setInterval(function() {
-                if (socket)
-                    socket.emit('get-session');
-            }, 1000);
-
-            $('#submit-socketio').click(function() {
-                socket.emit('set-session', {session: $('#socketio-session-set').val()});
-            });
-            $('#login-socketio').click(function() {
-                socket.emit('set-session', {user: $('#socketio-user-set').val()});
-            });
-            $('#logout-socketio').click(function() {
-                socket.emit('set-session', {user: null});
-            });
-        </script>
+        <script src="{{ url_for('static', filename='js/sessions.js') }}"></script>
     </body>
 </html>
