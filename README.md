@@ -37,3 +37,7 @@ $ source venv/bin/activate
 
 (venv) $ ./app.py --host 0.0.0.0  # Exposed to the network (be careful)
 ```
+
+## License
+
+MIT
